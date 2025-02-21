@@ -96,11 +96,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateMigrations = void 0;
 const node_fs_1 = __importDefault(__nccwpck_require__(7561));
-const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/);
+// eslint-disable-next-line regexp/no-unused-capturing-group, prefer-regex-literals
+const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{6}_(.*)\b/);
 function isFolderDateInPast(name) {
-    const year = parseFloat(name.slice(0, 4));
-    const month = parseFloat(name.slice(5, 6));
-    const day = parseFloat(name.slice(7, 8));
+    const year = Number.parseFloat(name.slice(0, 4));
+    const month = Number.parseFloat(name.slice(5, 6));
+    const day = Number.parseFloat(name.slice(7, 8));
     const date = new Date(year, month, day);
     return Date.now() > date.getTime();
 }
@@ -108,7 +109,7 @@ function validateMigrations(path, ignore) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         console.log(`Validating migrations at ${path}`);
-        console.log('-------------------');
+        console.log('---------------------------------------------------------');
         const opendir = node_fs_1.default.promises.opendir;
         const failedFiles = [];
         let totalFilesAnalyzed = 0;
@@ -133,16 +134,16 @@ function validateMigrations(path, ignore) {
                         // Test 1: Does the name match the pattern?
                         if (!FOLDER_NAME_PATTERN.test(dirent.name)) {
                             console.log(`❌ Migration ${dirent.name} is invalid format`);
-                            failedFiles.push(dirent.name);
+                            failedFiles.push({ name: dirent.name, reason: 'format' });
                             continue;
                         }
                         // Test 2: Is the date in the folder name in the past?
                         if (!isFolderDateInPast(dirent.name)) {
                             console.log(`❌ Migration ${dirent.name} is invalid date`);
-                            failedFiles.push(dirent.name);
+                            failedFiles.push({ name: dirent.name, reason: 'date' });
                             continue;
                         }
-                        console.log(`✅ Migration ${dirent.name} is valid`);
+                        console.log(`✅ Migration "${dirent.name}" is valid`);
                     }
                     finally {
                         _d = true;
@@ -156,22 +157,24 @@ function validateMigrations(path, ignore) {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            console.log('-------------------');
+            console.log('---------------------------------------------------------');
             console.log(`ℹ️ Migrations analyzed: \t${totalFilesAnalyzed}`);
+            console.log('---------------------------------------------------------');
         }
-        catch (error) {
-            throw new Error('Execution failed, see log above.');
+        catch (_e) {
+            throw new Error('❌ Execution failed, see log above.');
         }
         if (failedFiles.length) {
+            for (const issue of failedFiles) {
+                console.log(`❌ Migration "${issue.name}" failed due to "${issue.reason}"`);
+            }
             throw new Error(`${failedFiles.length} files not matching the pattern were found, see log above.`);
         }
-        else {
-            console.log('✅ Success: All migrations are correctly named!');
-            return {
-                totalFilesAnalyzed,
-                failedFiles,
-            };
-        }
+        console.log('✅ Success: All migrations are correctly named!');
+        return {
+            totalFilesAnalyzed,
+            failedFiles,
+        };
     });
 }
 exports.validateMigrations = validateMigrations;
