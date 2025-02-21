@@ -47,7 +47,8 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const path = core.getInput('path', { required: true }) || DEFAULT_PATH;
-            const output = yield (0, validate_migrations_1.validateMigrations)(path);
+            const ignore = core.getMultilineInput('ignore', { required: true }) || [];
+            const output = yield (0, validate_migrations_1.validateMigrations)(path, ignore);
             core.setOutput('total-files-analyzed', output.totalFilesAnalyzed);
             // Get the JSON webhook payload for the event that triggered the workflow
             const payload = JSON.stringify(github.context.payload, undefined, 2);
@@ -103,7 +104,7 @@ function isFolderDateInPast(name) {
     const date = new Date(year, month, day);
     return Date.now() > date.getTime();
 }
-function validateMigrations(path) {
+function validateMigrations(path, ignore) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         console.log(`Validating migrations at ${path}`);
@@ -121,6 +122,11 @@ function validateMigrations(path) {
                         const dirent = _c;
                         // Do not check file names
                         if (!dirent.isDirectory()) {
+                            continue;
+                        }
+                        // Check if migration is in ignore folder
+                        if (ignore.includes(dirent.name)) {
+                            console.log(`🟠 Migration ${dirent.name} is ignored`);
                             continue;
                         }
                         totalFilesAnalyzed++;

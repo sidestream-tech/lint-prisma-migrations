@@ -2,13 +2,12 @@ name: 'Migrations folder linter'
 description: 'This github action validates if the prisma migration folders follow a set naming structure'
 inputs:
   path:
-    description: 'The path to a directory to check the filenames.'
+    description: 'The path to the migrations directory'
     required: true
-    default: './'
-  pattern:
-    description: 'The regex pattern to match for each of the files in the given directory'
+    default: './prisma/migrations/'
+  ignore:
+    description: 'A list of migration names to ignore'
     required: true
-    default: '/.+/'
 outputs:
   total-files-analyzed:
     description: 'The number of files analyzed.'

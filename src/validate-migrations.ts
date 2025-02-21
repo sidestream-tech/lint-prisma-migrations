@@ -12,7 +12,7 @@ function isFolderDateInPast(name: string) {
   return Date.now() > date.getTime()
 }
 
-export async function validateMigrations(path: string) {
+export async function validateMigrations(path: string, ignore: string[]) {
   console.log(`Validating migrations at ${path}`)
   console.log('-------------------')
 
@@ -30,9 +30,14 @@ export async function validateMigrations(path: string) {
         continue
       }
 
+      // Check if migration is in ignore folder
+      if (ignore.includes(dirent.name)) {
+        console.log(`🟠 Migration ${dirent.name} is ignored`)
+        continue
+      }
+
       totalFilesAnalyzed++
 
-      
       // Test 1: Does the name match the pattern?
       if (!FOLDER_NAME_PATTERN.test(dirent.name)) {
         console.log(`❌ Migration ${dirent.name} is invalid format`)
