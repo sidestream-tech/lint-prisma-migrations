@@ -11,7 +11,7 @@ async function run(): Promise<void> {
     const ignore = core.getMultilineInput('ignore', { required: false }) || []
 
     const output = await validateMigrations(path, ignore)
-    
+
     core.setOutput('total-files-analyzed', output.totalFilesAnalyzed)
 
     // Get the JSON webhook payload for the event that triggered the workflow

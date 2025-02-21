@@ -1,11 +1,12 @@
 import fs from 'node:fs'
 
-const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/)
+// eslint-disable-next-line regexp/no-unused-capturing-group, prefer-regex-literals
+const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{6}_(.*)\b/)
 
 function isFolderDateInPast(name: string) {
-  const year = parseFloat(name.slice(0, 4))
-  const month = parseFloat(name.slice(5, 6))
-  const day = parseFloat(name.slice(7, 8))
+  const year = Number.parseFloat(name.slice(0, 4))
+  const month = Number.parseFloat(name.slice(5, 6))
+  const day = Number.parseFloat(name.slice(7, 8))
 
   const date = new Date(year, month, day)
 
@@ -43,21 +44,21 @@ export async function validateMigrations(path: string, ignore: string[]) {
         console.log(`❌ Migration ${dirent.name} is invalid format`)
         failedFiles.push(dirent.name)
         continue
-      } 
-      
+      }
+
       // Test 2: Is the date in the folder name in the past?
       if (!isFolderDateInPast(dirent.name)) {
         console.log(`❌ Migration ${dirent.name} is invalid date`)
         failedFiles.push(dirent.name)
         continue
       }
-      
+
       console.log(`✅ Migration ${dirent.name} is valid`)
     }
-    
+
     console.log('-------------------')
     console.log(`ℹ️ Migrations analyzed: \t${totalFilesAnalyzed}`)
-  } catch (error) {
+  } catch {
     throw new Error('Execution failed, see log above.')
   }
 
