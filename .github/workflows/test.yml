@@ -21,6 +21,4 @@ jobs:
         uses: ./
         with:
           path: './tests/fails'
-          ignore: 
-            - '20260101000000_should_also_not_work'
-            - '20270101000000_should_not_work'
+          ignore: ['20260101000000_should_also_not_work', '20270101000000_should_not_work']

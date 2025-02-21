@@ -8,6 +8,7 @@ inputs:
   ignore:
     description: 'A list of migration names to ignore'
     required: true
+    default: []
 outputs:
   total-files-analyzed:
     description: 'The number of files analyzed.'
