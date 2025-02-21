@@ -100,13 +100,11 @@ function doesFolderNameMatchFormat(name) {
     return FOLDER_NAME_PATTERN.test(name);
 }
 function isFolderDateInPast(name) {
-    const year = name.slice(0, 4);
-    const month = name.slice(5, 6);
-    const day = name.slice(7, 8);
-    const date = new Date(`${year}-${month}-${day}`);
-    console.log(date);
-    const now = new Date();
-    return now.getTime() > date.getTime();
+    const year = parseFloat(name.slice(0, 4));
+    const month = parseFloat(name.slice(5, 6));
+    const day = parseFloat(name.slice(7, 8));
+    const date = new Date(year, month, day);
+    return Date.now() > date.getTime();
 }
 function validateMigrations(path) {
     var _a, e_1, _b, _c;
@@ -131,17 +129,19 @@ function validateMigrations(path) {
                         totalFilesAnalyzed++;
                         // Test 1: Does the name match the pattern?
                         if (!doesFolderNameMatchFormat(dirent.name)) {
-                            console.log(`❌ Migration ${dirent.name} is invalid`);
+                            console.log(`❌ Migration ${dirent.name} is invalid format`);
                             failedFiles.push(dirent.name);
-                            continue;
                         }
-                        // Test 2: Is the date in the folder name in the past?
-                        if (!isFolderDateInPast(dirent.name)) {
-                            console.log(`❌ Migration ${dirent.name} is invalid`);
-                            failedFiles.push(dirent.name);
-                            continue;
+                        else {
+                            // Test 2: Is the date in the folder name in the past?
+                            if (!isFolderDateInPast(dirent.name)) {
+                                console.log(`❌ Migration ${dirent.name} is invalid date`);
+                                failedFiles.push(dirent.name);
+                            }
+                            else {
+                                console.log(`✅ Migration ${dirent.name} is valid`);
+                            }
                         }
-                        console.log(`✅ Migration ${dirent.name} is valid`);
                     }
                     finally {
                         _d = true;
