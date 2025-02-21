@@ -1,4 +1,4 @@
-name: 'Prisma migrations name linter'
+name: 'Lint Prisma migrations action'
 description: 'Goes through all Prisma migrations and ensures that the migration names match a standard format and have a valid date prefix'
 branding:
   icon: 'database'
