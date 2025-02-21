@@ -5,6 +5,7 @@
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
+    "lint": "eslint --max-warnings 0 ./src",
     "package": "ncc build --source-map"
   },
   "dependencies": {
@@ -14,6 +15,8 @@
   "devDependencies": {
     "@types/node": "22.13.1",
     "@vercel/ncc": "^0.34.0",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.3",
+    "@antfu/eslint-config": "^4.3.0",
+    "eslint": "^9.20.1"
   }
 }
