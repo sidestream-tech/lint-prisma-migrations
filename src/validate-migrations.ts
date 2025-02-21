@@ -1,10 +1,6 @@
 import fs from 'node:fs'
 
-const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/gm)
-
-function doesFolderNameMatchFormat(name: string) {
-    return FOLDER_NAME_PATTERN.test(name)
-}
+const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/)
 
 function isFolderDateInPast(name: string) {
   const year = parseFloat(name.slice(0, 4))
@@ -36,19 +32,22 @@ export async function validateMigrations(path: string) {
 
       totalFilesAnalyzed++
 
+      
       // Test 1: Does the name match the pattern?
-      if (!doesFolderNameMatchFormat(dirent.name)) {
+      if (!FOLDER_NAME_PATTERN.test(dirent.name)) {
         console.log(`❌ Migration ${dirent.name} is invalid format`)
         failedFiles.push(dirent.name)
-      } else {
-        // Test 2: Is the date in the folder name in the past?
-        if (!isFolderDateInPast(dirent.name)) {
-          console.log(`❌ Migration ${dirent.name} is invalid date`)
-          failedFiles.push(dirent.name)
-        } else {
-          console.log(`✅ Migration ${dirent.name} is valid`)
-        }
+        continue
+      } 
+      
+      // Test 2: Is the date in the folder name in the past?
+      if (!isFolderDateInPast(dirent.name)) {
+        console.log(`❌ Migration ${dirent.name} is invalid date`)
+        failedFiles.push(dirent.name)
+        continue
       }
+      
+      console.log(`✅ Migration ${dirent.name} is valid`)
     }
     
     console.log('-------------------')

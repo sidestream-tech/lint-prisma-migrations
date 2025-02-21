@@ -95,10 +95,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateMigrations = void 0;
 const node_fs_1 = __importDefault(__nccwpck_require__(7561));
-const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/gm);
-function doesFolderNameMatchFormat(name) {
-    return FOLDER_NAME_PATTERN.test(name);
-}
+const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/);
 function isFolderDateInPast(name) {
     const year = parseFloat(name.slice(0, 4));
     const month = parseFloat(name.slice(5, 6));
@@ -128,20 +125,18 @@ function validateMigrations(path) {
                         }
                         totalFilesAnalyzed++;
                         // Test 1: Does the name match the pattern?
-                        if (!doesFolderNameMatchFormat(dirent.name)) {
+                        if (!FOLDER_NAME_PATTERN.test(dirent.name)) {
                             console.log(`❌ Migration ${dirent.name} is invalid format`);
                             failedFiles.push(dirent.name);
+                            continue;
                         }
-                        else {
-                            // Test 2: Is the date in the folder name in the past?
-                            if (!isFolderDateInPast(dirent.name)) {
-                                console.log(`❌ Migration ${dirent.name} is invalid date`);
-                                failedFiles.push(dirent.name);
-                            }
-                            else {
-                                console.log(`✅ Migration ${dirent.name} is valid`);
-                            }
+                        // Test 2: Is the date in the folder name in the past?
+                        if (!isFolderDateInPast(dirent.name)) {
+                            console.log(`❌ Migration ${dirent.name} is invalid date`);
+                            failedFiles.push(dirent.name);
+                            continue;
                         }
+                        console.log(`✅ Migration ${dirent.name} is valid`);
                     }
                     finally {
                         _d = true;
