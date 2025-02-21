@@ -46,8 +46,8 @@ const DEFAULT_PATH = './prisma/migrations/';
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const path = core.getInput('path', { required: true }) || DEFAULT_PATH;
-            const ignore = core.getMultilineInput('ignore', { required: true }) || [];
+            const path = core.getInput('path', { required: false }) || DEFAULT_PATH;
+            const ignore = core.getMultilineInput('ignore', { required: false }) || [];
             const output = yield (0, validate_migrations_1.validateMigrations)(path, ignore);
             core.setOutput('total-files-analyzed', output.totalFilesAnalyzed);
             // Get the JSON webhook payload for the event that triggered the workflow

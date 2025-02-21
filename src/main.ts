@@ -7,8 +7,8 @@ const DEFAULT_PATH = './prisma/migrations/'
 
 async function run(): Promise<void> {
   try {
-    const path = core.getInput('path', { required: true }) || DEFAULT_PATH
-    const ignore = core.getMultilineInput('ignore', { required: true }) || []
+    const path = core.getInput('path', { required: false }) || DEFAULT_PATH
+    const ignore = core.getMultilineInput('ignore', { required: false }) || []
 
     const output = await validateMigrations(path, ignore)
     
