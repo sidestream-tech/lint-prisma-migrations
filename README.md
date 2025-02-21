@@ -1,8 +1,12 @@
-## Migrations Folder Linter
+# Lint Prisma migrations action
 
-This github action validates if the prisma migration folders follow a set naming structure
+**Lint Prisma migrations** is a github action that can lint the names of your [Prisma Migrations](https://www.prisma.io/docs/orm/prisma-migrate) based on a set of rules. The action was originally developed for [SIDESTREAM](https://github.com/sidestream-tech/).
 
-### Example
+The action checks that:
+- The name matches the format of `YYYYMMDDHHMMSS_YOUR_MIGRATION_NAME`
+- The date specified inside the migration name is not in the future
+
+## Example
 
 ```yml
 jobs:
@@ -13,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate prisma migration folder names
-        uses: zoey-kaiser/migrations-folder-linter@0.1.0
+        uses: zoey-kaiser/migrations-folder-linter@0.2.0
         with:
           path: ./prisma/migrations/
           ignore: |
@@ -21,12 +25,16 @@ jobs:
             20270101000000_ignore_me_too
 ```
 
-### Inputs
+## Inputs
 
-#### `path`
+### `path`
 
 The path to the Prisma migrations folder.
 
-#### `ignore`
+### `ignore`
 
 A multiline input of migration names to ignore. Helpful if these were already applied and their naming cannot be fixed.
+
+## Credits
+
+This action was developed by [Zoey Kaiser](https://github.com/zoey-kaiser) and was based on https://github.com/batista/lint-filenames

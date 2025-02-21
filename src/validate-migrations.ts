@@ -15,11 +15,11 @@ function isFolderDateInPast(name: string) {
 
 export async function validateMigrations(path: string, ignore: string[]) {
   console.log(`Validating migrations at ${path}`)
-  console.log('-------------------')
+  console.log('---------------------------------------------------------')
 
   const opendir = fs.promises.opendir
 
-  const failedFiles: string[] = []
+  const failedFiles: { name: string, reason: 'format' | 'date' }[] = []
   let totalFilesAnalyzed = 0
 
   try {
@@ -42,33 +42,37 @@ export async function validateMigrations(path: string, ignore: string[]) {
       // Test 1: Does the name match the pattern?
       if (!FOLDER_NAME_PATTERN.test(dirent.name)) {
         console.log(`❌ Migration ${dirent.name} is invalid format`)
-        failedFiles.push(dirent.name)
+        failedFiles.push({ name: dirent.name, reason: 'format' })
         continue
       }
 
       // Test 2: Is the date in the folder name in the past?
       if (!isFolderDateInPast(dirent.name)) {
         console.log(`❌ Migration ${dirent.name} is invalid date`)
-        failedFiles.push(dirent.name)
+        failedFiles.push({ name: dirent.name, reason: 'date' })
         continue
       }
 
-      console.log(`✅ Migration ${dirent.name} is valid`)
+      console.log(`✅ Migration "${dirent.name}" is valid`)
     }
 
-    console.log('-------------------')
+    console.log('---------------------------------------------------------')
     console.log(`ℹ️ Migrations analyzed: \t${totalFilesAnalyzed}`)
+    console.log('---------------------------------------------------------')
   } catch {
-    throw new Error('Execution failed, see log above.')
+    throw new Error('❌ Execution failed, see log above.')
   }
 
   if (failedFiles.length) {
-    throw new Error(`${failedFiles.length} files not matching the pattern were found, see log above.`)
-  } else {
-    console.log('✅ Success: All migrations are correctly named!')
-    return {
-      totalFilesAnalyzed,
-      failedFiles,
+    for (const issue of failedFiles) {
+      console.log(`❌ Migration "${issue.name}" failed due to "${issue.reason}"`)
     }
+    throw new Error(`${failedFiles.length} files not matching the pattern were found, see log above.`)
+  }
+
+  console.log('✅ Success: All migrations are correctly named!')
+  return {
+    totalFilesAnalyzed,
+    failedFiles,
   }
 }
