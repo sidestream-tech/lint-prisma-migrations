@@ -103,6 +103,7 @@ function validateMigrations(path) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         console.log(`Validating migrations at ${path}`);
+        console.log('-------------------');
         const opendir = node_fs_1.default.promises.opendir;
         const failedFiles = [];
         let totalFilesAnalyzed = 0;
@@ -140,7 +141,7 @@ function validateMigrations(path) {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            console.log('Verification finished.');
+            console.log('-------------------');
             console.log(`ℹ️ Migrations analyzed: \t${totalFilesAnalyzed}`);
         }
         catch (error) {

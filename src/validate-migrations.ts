@@ -8,7 +8,8 @@ function doesFolderNameMatchFormat(name: string) {
 
 export async function validateMigrations(path: string) {
   console.log(`Validating migrations at ${path}`)
-  
+  console.log('-------------------')
+
   const opendir = fs.promises.opendir
 
   const failedFiles: string[] = []
@@ -34,7 +35,7 @@ export async function validateMigrations(path: string) {
       }
     }
     
-    console.log('Verification finished.')
+    console.log('-------------------')
     console.log(`ℹ️ Migrations analyzed: \t${totalFilesAnalyzed}`)
   } catch (error) {
     throw new Error('Execution failed, see log above.')
