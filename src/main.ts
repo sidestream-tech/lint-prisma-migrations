@@ -3,8 +3,7 @@ import * as github from '@actions/github'
 
 import { validateFilenames } from './validate-filenames'
 
-const DEFAULT_PATTERN = '^.+\\..+$'
-const DEFAULT_PATH = '.'
+const DEFAULT_PATH = './prisma/migrations/'
 
 async function run(): Promise<void> {
   try {
@@ -13,9 +12,7 @@ async function run(): Promise<void> {
     console.log('====================')
 
     const path = core.getInput('path', { required: true }) || DEFAULT_PATH
-    const pattern = new RegExp(
-      core.getInput('pattern', { required: true }) || DEFAULT_PATTERN,
-    )
+    const pattern = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/gm)
 
     const output = await validateFilenames(path, pattern)
 

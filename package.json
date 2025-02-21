@@ -1,4 +1,6 @@
 {
+  "name": "@zoey-kaiser/migrations-folder-linter",
+  "version": "0.1.0",
   "private": true,
   "main": "lib/main.js",
   "scripts": {
