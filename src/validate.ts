@@ -1,6 +1,6 @@
 import fs from 'node:fs'
-import { isFormatValid } from './rules/format'
 import { isDateValid } from './rules/date'
+import { isFormatValid } from './rules/format'
 
 export async function validate(path: string, ignore: string[]) {
   console.log(`Validating migrations at ${path}`)
