@@ -99,6 +99,15 @@ const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0
 function doesFolderNameMatchFormat(name) {
     return FOLDER_NAME_PATTERN.test(name);
 }
+function isFolderDateInPast(name) {
+    const year = name.slice(0, 4);
+    const month = name.slice(5, 6);
+    const day = name.slice(7, 8);
+    const date = new Date(`${year}-${month}-${day}`);
+    console.log(date);
+    const now = new Date();
+    return now.getTime() > date.getTime();
+}
 function validateMigrations(path) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
@@ -124,10 +133,15 @@ function validateMigrations(path) {
                         if (!doesFolderNameMatchFormat(dirent.name)) {
                             console.log(`❌ Migration ${dirent.name} is invalid`);
                             failedFiles.push(dirent.name);
+                            continue;
                         }
-                        else {
-                            console.log(`✅ Migration ${dirent.name} is valid`);
+                        // Test 2: Is the date in the folder name in the past?
+                        if (!isFolderDateInPast(dirent.name)) {
+                            console.log(`❌ Migration ${dirent.name} is invalid`);
+                            failedFiles.push(dirent.name);
+                            continue;
                         }
+                        console.log(`✅ Migration ${dirent.name} is valid`);
                     }
                     finally {
                         _d = true;
