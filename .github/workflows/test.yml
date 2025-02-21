@@ -12,7 +12,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: test-prisma-migration-folders
+      - name: Tests folders that should work
         uses: ./
         with:
-          path: './tests/prisma'
+          path: './tests/works'
+
+      - name: Tests folders that should not work
+        uses: ./
+        with:
+          path: './tests/fails'
