@@ -15,12 +15,12 @@ jobs:
       - name: Tests folders that should work
         uses: ./
         with:
-          path: './tests/works'
+          path: './demo/works'
 
       - name: Tests folders that should not work but are ignored
         uses: ./
         with:
-          path: './tests/fails'
+          path: './demo/fails'
           ignore: |
             20260101000000_should_also_not_work
             20270101000000_should_not_work
