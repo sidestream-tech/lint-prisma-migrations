@@ -41,14 +41,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(9090));
 const github = __importStar(__nccwpck_require__(9939));
-const validate_migrations_1 = __nccwpck_require__(9488);
+const validate_1 = __nccwpck_require__(1252);
 const DEFAULT_PATH = './prisma/migrations/';
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const path = core.getInput('path', { required: false }) || DEFAULT_PATH;
             const ignore = core.getMultilineInput('ignore', { required: false }) || [];
-            const output = yield (0, validate_migrations_1.validateMigrations)(path, ignore);
+            const output = yield (0, validate_1.validate)(path, ignore);
             core.setOutput('total-files-analyzed', output.totalFilesAnalyzed);
             // Get the JSON webhook payload for the event that triggered the workflow
             const payload = JSON.stringify(github.context.payload, undefined, 2);
@@ -69,7 +69,43 @@ run();
 
 /***/ }),
 
-/***/ 9488:
+/***/ 4760:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isDateValid = void 0;
+function isDateValid(name) {
+    const year = Number.parseFloat(name.slice(0, 4));
+    const month = Number.parseFloat(name.slice(5, 6));
+    const day = Number.parseFloat(name.slice(7, 8));
+    const date = new Date(year, (month - 1), day);
+    return Date.now() > date.getTime();
+}
+exports.isDateValid = isDateValid;
+
+
+/***/ }),
+
+/***/ 6107:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isFormatValid = void 0;
+// eslint-disable-next-line prefer-regex-literals, regexp/no-unused-capturing-group
+const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{6}_(.*)\b/);
+function isFormatValid(name) {
+    return FOLDER_NAME_PATTERN.test(name);
+}
+exports.isFormatValid = isFormatValid;
+
+
+/***/ }),
+
+/***/ 1252:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -94,18 +130,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validateMigrations = void 0;
+exports.validate = void 0;
 const node_fs_1 = __importDefault(__nccwpck_require__(7561));
-// eslint-disable-next-line regexp/no-unused-capturing-group, prefer-regex-literals
-const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{6}_(.*)\b/);
-function isFolderDateInPast(name) {
-    const year = Number.parseFloat(name.slice(0, 4));
-    const month = Number.parseFloat(name.slice(5, 6));
-    const day = Number.parseFloat(name.slice(7, 8));
-    const date = new Date(year, month, day);
-    return Date.now() > date.getTime();
-}
-function validateMigrations(path, ignore) {
+const date_1 = __nccwpck_require__(4760);
+const format_1 = __nccwpck_require__(6107);
+function validate(path, ignore) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         console.log(`Validating migrations at ${path}`);
@@ -132,13 +161,13 @@ function validateMigrations(path, ignore) {
                         }
                         totalFilesAnalyzed++;
                         // Test 1: Does the name match the pattern?
-                        if (!FOLDER_NAME_PATTERN.test(dirent.name)) {
+                        if (!(0, format_1.isFormatValid)(dirent.name)) {
                             console.log(`❌ Migration ${dirent.name} is invalid format`);
                             failedFiles.push({ name: dirent.name, reason: 'format' });
                             continue;
                         }
                         // Test 2: Is the date in the folder name in the past?
-                        if (!isFolderDateInPast(dirent.name)) {
+                        if (!(0, date_1.isDateValid)(dirent.name)) {
                             console.log(`❌ Migration ${dirent.name} is invalid date`);
                             failedFiles.push({ name: dirent.name, reason: 'date' });
                             continue;
@@ -177,7 +206,7 @@ function validateMigrations(path, ignore) {
         };
     });
 }
-exports.validateMigrations = validateMigrations;
+exports.validate = validate;
 
 
 /***/ }),

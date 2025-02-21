@@ -2,13 +2,9 @@ import antfu from '@antfu/eslint-config'
 
 const ignores = [
   'node_modules',
-  '**/node_modules/**',
   'dist',
-  '**/dist/**',
-  'dist',
-  '**/dist/**',
   'lib',
-  '**/lib/**',
+  'demo',
 ]
 
 export default antfu({

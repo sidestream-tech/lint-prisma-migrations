@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
-import { validateMigrations } from './validate-migrations'
+import { validate } from './validate'
 
 const DEFAULT_PATH = './prisma/migrations/'
 
@@ -10,7 +10,7 @@ async function run(): Promise<void> {
     const path = core.getInput('path', { required: false }) || DEFAULT_PATH
     const ignore = core.getMultilineInput('ignore', { required: false }) || []
 
-    const output = await validateMigrations(path, ignore)
+    const output = await validate(path, ignore)
 
     core.setOutput('total-files-analyzed', output.totalFilesAnalyzed)
 
