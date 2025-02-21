@@ -15,4 +15,4 @@ jobs:
       - name: test-prisma-migration-folders
         uses: ./
         with:
-          path: './__tests__/test-files/02-name-dot-extension-files'
+          path: './tests/prisma'
