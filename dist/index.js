@@ -116,7 +116,8 @@ function validateFilenames(path, pattern) {
                     _d = false;
                     try {
                         const dirent = _c;
-                        if (dirent.isDirectory()) {
+                        // Do not check file names
+                        if (!dirent.isDirectory()) {
                             continue;
                         }
                         totalFilesAnalyzed++;

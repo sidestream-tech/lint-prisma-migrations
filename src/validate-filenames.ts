@@ -12,9 +12,11 @@ export async function validateFilenames(path: string, pattern: RegExp): Promise<
 
     console.log('Verification starting...')
     for await (const dirent of dir) {
-      if (dirent.isDirectory()) {
+      // Do not check file names
+      if (!dirent.isDirectory()) {
         continue
       }
+
       totalFilesAnalyzed++
       if (pattern.test(dirent.name)) {
         console.log(`  ✔️  ${dirent.name}`)
@@ -23,6 +25,7 @@ export async function validateFilenames(path: string, pattern: RegExp): Promise<
         failedFiles.push(dirent.name)
       }
     }
+    
     console.log('Verification finished.')
     console.log(`ℹ️  Files analyzed: \t${totalFilesAnalyzed}`)
   } catch (error) {
