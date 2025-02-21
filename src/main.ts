@@ -1,21 +1,16 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
-import { validateFilenames } from './validate-filenames'
+import { validateMigrations } from './validate-migrations'
 
 const DEFAULT_PATH = './prisma/migrations/'
 
 async function run(): Promise<void> {
   try {
-    console.log('====================')
-    console.log('|  Lint Filenames  |')
-    console.log('====================')
-
     const path = core.getInput('path', { required: true }) || DEFAULT_PATH
-    const pattern = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/gm)
 
-    const output = await validateFilenames(path, pattern)
-
+    const output = await validateMigrations(path)
+    
     core.setOutput('total-files-analyzed', output.totalFilesAnalyzed)
 
     // Get the JSON webhook payload for the event that triggered the workflow

@@ -41,17 +41,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(9090));
 const github = __importStar(__nccwpck_require__(9939));
-const validate_filenames_1 = __nccwpck_require__(8273);
+const validate_migrations_1 = __nccwpck_require__(9488);
 const DEFAULT_PATH = './prisma/migrations/';
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log('====================');
-            console.log('|  Lint Filenames  |');
-            console.log('====================');
             const path = core.getInput('path', { required: true }) || DEFAULT_PATH;
-            const pattern = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/gm);
-            const output = yield (0, validate_filenames_1.validateFilenames)(path, pattern);
+            const output = yield (0, validate_migrations_1.validateMigrations)(path);
             core.setOutput('total-files-analyzed', output.totalFilesAnalyzed);
             // Get the JSON webhook payload for the event that triggered the workflow
             const payload = JSON.stringify(github.context.payload, undefined, 2);
@@ -72,7 +68,7 @@ run();
 
 /***/ }),
 
-/***/ 8273:
+/***/ 9488:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -97,19 +93,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validateFilenames = void 0;
+exports.validateMigrations = void 0;
 const node_fs_1 = __importDefault(__nccwpck_require__(7561));
-function validateFilenames(path, pattern) {
+const FOLDER_NAME_PATTERN = new RegExp(/\b(20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{6}_(.*)\b/gm);
+function doesFolderNameMatchFormat(name) {
+    return FOLDER_NAME_PATTERN.test(name);
+}
+function validateMigrations(path) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(`ℹ️  Path:    \t\t'${path}'`);
-        console.log(`ℹ️  Pattern: \t\t${pattern}`);
+        console.log(`Validating migrations at ${path}`);
         const opendir = node_fs_1.default.promises.opendir;
         const failedFiles = [];
         let totalFilesAnalyzed = 0;
         try {
             const dir = yield opendir(path);
-            console.log('Verification starting...');
             try {
                 for (var _d = true, dir_1 = __asyncValues(dir), dir_1_1; dir_1_1 = yield dir_1.next(), _a = dir_1_1.done, !_a;) {
                     _c = dir_1_1.value;
@@ -121,12 +119,13 @@ function validateFilenames(path, pattern) {
                             continue;
                         }
                         totalFilesAnalyzed++;
-                        if (pattern.test(dirent.name)) {
-                            console.log(`  ✔️  ${dirent.name}`);
+                        // Test 1: Does the name match the pattern?
+                        if (!doesFolderNameMatchFormat(dirent.name)) {
+                            console.log(`❌ Migration ${dirent.name} is invalid`);
+                            failedFiles.push(dirent.name);
                         }
                         else {
-                            console.log(`  ❌  ${dirent.name}`);
-                            failedFiles.push(dirent.name);
+                            console.log(`✅ Migration ${dirent.name} is valid`);
                         }
                     }
                     finally {
@@ -142,16 +141,16 @@ function validateFilenames(path, pattern) {
                 finally { if (e_1) throw e_1.error; }
             }
             console.log('Verification finished.');
-            console.log(`ℹ️  Files analyzed: \t${totalFilesAnalyzed}`);
+            console.log(`ℹ️ Migrations analyzed: \t${totalFilesAnalyzed}`);
         }
         catch (error) {
-            throw new Error('Execution failed, see log above. ❌');
+            throw new Error('Execution failed, see log above.');
         }
         if (failedFiles.length) {
-            throw new Error(`${failedFiles.length} files not matching the pattern were found, see log above. ❌`);
+            throw new Error(`${failedFiles.length} files not matching the pattern were found, see log above.`);
         }
         else {
-            console.log('✅ Success: All files match the given pattern!');
+            console.log('✅ Success: All migrations are correctly named!');
             return {
                 totalFilesAnalyzed,
                 failedFiles,
@@ -159,7 +158,7 @@ function validateFilenames(path, pattern) {
         }
     });
 }
-exports.validateFilenames = validateFilenames;
+exports.validateMigrations = validateMigrations;
 
 
 /***/ }),
