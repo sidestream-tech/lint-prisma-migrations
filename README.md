@@ -37,4 +37,4 @@ A multiline input of migration names to ignore. Helpful if these were already ap
 
 ## Credits
 
-This action was developed by [Zoey Kaiser](https://github.com/zoey-kaiser) and was based on https://github.com/batista/lint-filenames
+This action was inspired by https://github.com/batista/lint-filenames
