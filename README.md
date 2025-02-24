@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate prisma migration folder names
-        uses: zoey-kaiser/migrations-folder-linter@1.0.0
+        uses: sidestream-tech/lint-prisma-migrations@1.1.0
         with:
           path: ./prisma/migrations/
           ignore: |
@@ -37,4 +37,4 @@ A multiline input of migration names to ignore. Helpful if these were already ap
 
 ## Credits
 
-This action was developed by [Zoey Kaiser](https://github.com/zoey-kaiser) and was based on https://github.com/batista/lint-filenames
+This action was inspired by https://github.com/batista/lint-filenames
