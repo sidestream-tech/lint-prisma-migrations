@@ -1,6 +1,6 @@
 {
-  "name": "@zoey-kaiser/migrations-folder-linter",
-  "version": "1.0.0",
+  "name": "@sidestream-tech/lint-prisma-migrations",
+  "version": "1.1.0",
   "private": true,
   "main": "lib/main.js",
   "scripts": {
