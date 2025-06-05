@@ -13,32 +13,19 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - name: Use pnpm ${{ env.PNPM_VERSION }}
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
 
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - uses: pnpm/action-setup@v3
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          cache: pnpm
 
       - run: pnpm install
       - run: pnpm lint
@@ -54,12 +41,12 @@ jobs:
       - name: Tests folders that should work
         uses: ./
         with:
-          path: './stubs/works'
+          path: './stubs'
 
-      - name: Tests folders that should not work but are ignored
+      - name: Tests folders are ignored
         uses: ./
         with:
-          path: './stubs/fails'
+          path: './stubs'
           ignore: |
-            20260101000000_should_also_not_work
-            20270101000000_should_not_work
+            20250101000000_should_work
+            20240101000000_should_also_work

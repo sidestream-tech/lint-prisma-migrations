@@ -1,14 +1,22 @@
 import fs from 'node:fs'
+import { joinURL } from 'ufo'
 import { isDateValid } from './rules/date'
 import { isFormatValid } from './rules/format'
+import { hasPRLink } from './rules/link'
+import { hasTransactionWrapper } from './rules/transaction'
 
 export async function validate(path: string, ignore: string[]) {
   console.log(`Validating migrations at ${path}`)
   console.log('---------------------------------------------------------')
 
   const opendir = fs.promises.opendir
+  const existsSync = fs.existsSync
+  const readFile = fs.promises.readFile
 
-  const failedFiles: { name: string, reason: 'format' | 'date' }[] = []
+  const failedFiles: {
+    name: string
+    reason: 'format' | 'date' | 'missing' | 'link' | 'transaction'
+  }[] = []
   let totalFilesAnalyzed = 0
 
   try {
@@ -39,6 +47,30 @@ export async function validate(path: string, ignore: string[]) {
       if (!isDateValid(dirent.name)) {
         console.log(`❌ Migration ${dirent.name} is invalid date`)
         failedFiles.push({ name: dirent.name, reason: 'date' })
+        continue
+      }
+
+      // Test 3: Does the migration folder contain a migration.sql file?
+      const filePath = joinURL(dirent.parentPath, dirent.name, 'migration.sql')
+      if (!existsSync(filePath)) {
+        console.log(`❌ Migration ${dirent.name} does not contain a migration.sql file`)
+        failedFiles.push({ name: dirent.name, reason: 'missing' })
+        continue
+      }
+
+      const migration = await readFile(filePath, 'utf8')
+
+      // Test 4: Does the migration file have a PR linked at the top?
+      if (!hasPRLink(migration)) {
+        console.log(`❌ Migration ${dirent.name} does not have a PR linked at the top of the migration`)
+        failedFiles.push({ name: dirent.name, reason: 'link' })
+        continue
+      }
+
+      // Test 5: Is the migration wrapped in a transaction block?
+      if (!hasTransactionWrapper(migration)) {
+        console.log(`❌ Migration ${dirent.name} is not wrapped in a transaction block`)
+        failedFiles.push({ name: dirent.name, reason: 'transaction' })
         continue
       }
 

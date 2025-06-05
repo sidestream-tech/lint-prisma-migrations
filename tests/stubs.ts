@@ -11,3 +11,49 @@ export const INVALID_NAMES_FORMAT: string[] = [
   '20241306165300_invalid_month',
   '20240134165300_invalid_day',
 ]
+
+export const CORRECT_MIGRATION = `-- https://github.com/sidestream-tech/lint-prisma-migrations/pull/1
+BEGIN;
+
+-- CreateEnum
+CREATE TYPE "Enum" AS ENUM ('One', 'Two');
+
+-- CreateTable
+CREATE TABLE "MyTable" (
+    "id" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+
+    CONSTRAINT "TaskError_pkey" PRIMARY KEY ("id")
+);
+
+COMMIT;
+`
+
+export const INCORRECT_MIGRATION_PR_LINK = `BEGIN;
+
+-- CreateEnum
+CREATE TYPE "Enum" AS ENUM ('One', 'Two');
+
+-- CreateTable
+CREATE TABLE "MyTable" (
+    "id" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+
+    CONSTRAINT "TaskError_pkey" PRIMARY KEY ("id")
+);
+
+COMMIT;
+`
+
+export const INCORRECT_MIGRATION_TRANSACTION_BLOCK = `-- https://github.com/sidestream-tech/lint-prisma-migrations/pull/1
+-- CreateEnum
+CREATE TYPE "Enum" AS ENUM ('One', 'Two');
+
+-- CreateTable
+CREATE TABLE "MyTable" (
+    "id" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+
+    CONSTRAINT "TaskError_pkey" PRIMARY KEY ("id")
+);
+`
