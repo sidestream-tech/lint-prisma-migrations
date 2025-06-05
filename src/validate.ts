@@ -15,36 +15,38 @@ export async function validate(path: string, ignore: string[]) {
     const dir = await opendir(path)
 
     for await (const dirent of dir) {
-      // Do not check file names
-      if (!dirent.isDirectory()) {
+      // Directory checks
+      if (dirent.isDirectory()) {
+        // Check if migration is in ignore folder
+        if (ignore.includes(dirent.name)) {
+          console.log(`🟠 Migration ${dirent.name} is ignored`)
+          continue
+        }
+
+        totalFilesAnalyzed++
+
+        // Test 1: Does the name match the pattern?
+        if (!isFormatValid(dirent.name)) {
+          console.log(`❌ Migration ${dirent.name} is invalid format`)
+          failedFiles.push({ name: dirent.name, reason: 'format' })
+          continue
+        }
+
+        // Test 2: Is the date in the folder name in the past?
+        if (!isDateValid(dirent.name)) {
+          console.log(`❌ Migration ${dirent.name} is invalid date`)
+          failedFiles.push({ name: dirent.name, reason: 'date' })
+          continue
+        }
+
+        console.log(`✅ Migration "${dirent.name}" is valid`)
         continue
       }
 
-      // Check if migration is in ignore folder
-      if (ignore.includes(dirent.name)) {
-        console.log(`🟠 Migration ${dirent.name} is ignored`)
-        continue
+      // File checks
+      if (dirent.isFile()) {
+        console.log(dirent)
       }
-
-      totalFilesAnalyzed++
-
-      // Test 1: Does the name match the pattern?
-      if (!isFormatValid(dirent.name)) {
-        console.log(`❌ Migration ${dirent.name} is invalid format`)
-        failedFiles.push({ name: dirent.name, reason: 'format' })
-        continue
-      }
-
-      // Test 2: Is the date in the folder name in the past?
-      if (!isDateValid(dirent.name)) {
-        console.log(`❌ Migration ${dirent.name} is invalid date`)
-        failedFiles.push({ name: dirent.name, reason: 'date' })
-        continue
-      }
-
-      console.log(dirent.parentPath)
-
-      console.log(`✅ Migration "${dirent.name}" is valid`)
     }
 
     console.log('---------------------------------------------------------')

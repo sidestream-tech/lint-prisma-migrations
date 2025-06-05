@@ -150,30 +150,33 @@ function validate(path, ignore) {
                     _d = false;
                     try {
                         const dirent = _c;
-                        // Do not check file names
-                        if (!dirent.isDirectory()) {
+                        // Directory checks
+                        if (dirent.isDirectory()) {
+                            // Check if migration is in ignore folder
+                            if (ignore.includes(dirent.name)) {
+                                console.log(`🟠 Migration ${dirent.name} is ignored`);
+                                continue;
+                            }
+                            totalFilesAnalyzed++;
+                            // Test 1: Does the name match the pattern?
+                            if (!(0, format_1.isFormatValid)(dirent.name)) {
+                                console.log(`❌ Migration ${dirent.name} is invalid format`);
+                                failedFiles.push({ name: dirent.name, reason: 'format' });
+                                continue;
+                            }
+                            // Test 2: Is the date in the folder name in the past?
+                            if (!(0, date_1.isDateValid)(dirent.name)) {
+                                console.log(`❌ Migration ${dirent.name} is invalid date`);
+                                failedFiles.push({ name: dirent.name, reason: 'date' });
+                                continue;
+                            }
+                            console.log(`✅ Migration "${dirent.name}" is valid`);
                             continue;
                         }
-                        // Check if migration is in ignore folder
-                        if (ignore.includes(dirent.name)) {
-                            console.log(`🟠 Migration ${dirent.name} is ignored`);
-                            continue;
+                        // File checks
+                        if (dirent.isFile()) {
+                            console.log(dirent);
                         }
-                        totalFilesAnalyzed++;
-                        // Test 1: Does the name match the pattern?
-                        if (!(0, format_1.isFormatValid)(dirent.name)) {
-                            console.log(`❌ Migration ${dirent.name} is invalid format`);
-                            failedFiles.push({ name: dirent.name, reason: 'format' });
-                            continue;
-                        }
-                        // Test 2: Is the date in the folder name in the past?
-                        if (!(0, date_1.isDateValid)(dirent.name)) {
-                            console.log(`❌ Migration ${dirent.name} is invalid date`);
-                            failedFiles.push({ name: dirent.name, reason: 'date' });
-                            continue;
-                        }
-                        console.log(dirent.parentPath);
-                        console.log(`✅ Migration "${dirent.name}" is valid`);
                     }
                     finally {
                         _d = true;
