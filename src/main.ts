@@ -1,16 +1,15 @@
-import type { Rule } from './validate'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+
 import { validate } from './validate'
 
 const DEFAULT_PATH = './prisma/migrations/'
-const DEFAULT_RULES: Rule[] = ['date', 'format', 'missing', 'link', 'transaction']
 
 async function run(): Promise<void> {
   try {
     const path = core.getInput('path', { required: false }) || DEFAULT_PATH
-    const ignore = core.getMultilineInput('ignore', { required: false }) || []
-    const rules = core.getMultilineInput('rules', { required: false }) || DEFAULT_RULES
+    const ignore = core.getMultilineInput('ignore', { required: false })
+    const rules = core.getMultilineInput('rules', { required: false })
 
     const output = await validate(path, { ignore, rules })
 
