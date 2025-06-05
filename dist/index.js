@@ -105,6 +105,39 @@ exports.isFormatValid = isFormatValid;
 
 /***/ }),
 
+/***/ 6629:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.hasPRLink = void 0;
+function hasPRLink(migration) {
+    return migration.trim().startsWith('-- https://github.com/');
+}
+exports.hasPRLink = hasPRLink;
+
+
+/***/ }),
+
+/***/ 9094:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.hasTransactionWrapper = void 0;
+function hasTransactionWrapper(migration) {
+    const trimmedContent = migration.trim().toLowerCase();
+    const hasBeginStatement = trimmedContent.includes('begin;');
+    const hasCommitStatement = trimmedContent.endsWith('commit;');
+    return hasBeginStatement && hasCommitStatement;
+}
+exports.hasTransactionWrapper = hasTransactionWrapper;
+
+
+/***/ }),
+
 /***/ 1252:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -135,6 +168,8 @@ const node_fs_1 = __importDefault(__nccwpck_require__(7561));
 const ufo_1 = __nccwpck_require__(2184);
 const date_1 = __nccwpck_require__(4760);
 const format_1 = __nccwpck_require__(6107);
+const link_1 = __nccwpck_require__(6629);
+const transaction_1 = __nccwpck_require__(9094);
 function validate(path, ignore) {
     var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
@@ -182,13 +217,20 @@ function validate(path, ignore) {
                             failedFiles.push({ name: dirent.name, reason: 'missing' });
                             continue;
                         }
-                        const migrationFile = yield readFile(filePath, 'utf8');
-                        console.log(migrationFile);
-                        console.log(`✅ Migration "${dirent.name}" is valid`);
-                        // File checks
-                        if (dirent.isFile()) {
-                            console.log(dirent);
+                        const migration = yield readFile(filePath, 'utf8');
+                        // Test 4: Does the migration file have a PR linked at the top?
+                        if (!(0, link_1.hasPRLink)(migration)) {
+                            console.log(`❌ Migration ${dirent.name} does not have a PR linked at the top of the migration`);
+                            failedFiles.push({ name: dirent.name, reason: 'link' });
+                            continue;
                         }
+                        // Test 5: Is the migration wrapped in a transaction block?
+                        if (!(0, transaction_1.hasTransactionWrapper)(migration)) {
+                            console.log(`❌ Migration ${dirent.name} is not wrapped in a transaction block`);
+                            failedFiles.push({ name: dirent.name, reason: 'transaction' });
+                            continue;
+                        }
+                        console.log(`✅ Migration "${dirent.name}" is valid`);
                     }
                     finally {
                         _d = true;
