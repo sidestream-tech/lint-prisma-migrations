@@ -1,4 +1,5 @@
 -- https://github.com/sidestream-tech/lint-prisma-migrations/pull/1
+BEGIN;
 
 -- CreateEnum
 CREATE TYPE "Enum" AS ENUM ('One', 'Two');
