@@ -16,7 +16,7 @@ interface ValidateOptions {
 export async function validate(path: string, options: ValidateOptions) {
   const rules = options.rules.length > 0 ? options.rules : DEFAULT_RULES
 
-  console.log(`Validating migrations at ${path} with ${rules.join(', ')}`)
+  console.log(`Validating migrations at ${path} with rules: ${rules.join(', ')}`)
   console.log('---------------------------------------------------------')
 
   const opendir = fs.promises.opendir

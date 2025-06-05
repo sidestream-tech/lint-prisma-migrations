@@ -182,7 +182,7 @@ function validate(path, options) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, e_1, _b, _c;
         const rules = options.rules.length > 0 ? options.rules : DEFAULT_RULES;
-        console.log(`Validating migrations at ${path} with ${rules.join(', ')}`);
+        console.log(`Validating migrations at ${path} with rules: ${rules.join(', ')}`);
         console.log('---------------------------------------------------------');
         const opendir = node_fs_1.default.promises.opendir;
         const existsSync = node_fs_1.default.existsSync;
