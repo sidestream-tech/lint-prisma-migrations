@@ -7,6 +7,7 @@ export async function validate(path: string, ignore: string[]) {
   console.log('---------------------------------------------------------')
 
   const opendir = fs.promises.opendir
+  const readFile = fs.promises.readFile
 
   const failedFiles: { name: string, reason: 'format' | 'date' }[] = []
   let totalFilesAnalyzed = 0
@@ -41,6 +42,9 @@ export async function validate(path: string, ignore: string[]) {
         failedFiles.push({ name: dirent.name, reason: 'date' })
         continue
       }
+
+      console.log(dirent.parentPath)
+      const fileContents = await readFile(dirent.parentPath)
 
       console.log(`✅ Migration "${dirent.name}" is valid`)
     }
