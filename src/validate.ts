@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import { joinURL } from 'ufo'
 import { isDateValid } from './rules/date'
 import { isFormatValid } from './rules/format'
 
@@ -7,41 +8,53 @@ export async function validate(path: string, ignore: string[]) {
   console.log('---------------------------------------------------------')
 
   const opendir = fs.promises.opendir
+  const existsSync = fs.existsSync
 
-  const failedFiles: { name: string, reason: 'format' | 'date' }[] = []
+  const failedFiles: {
+    name: string
+    reason: 'format' | 'date' | 'missing'
+  }[] = []
   let totalFilesAnalyzed = 0
 
   try {
     const dir = await opendir(path)
 
     for await (const dirent of dir) {
-      // Directory checks
-      if (dirent.isDirectory()) {
-        // Check if migration is in ignore folder
-        if (ignore.includes(dirent.name)) {
-          console.log(`🟠 Migration ${dirent.name} is ignored`)
-          continue
-        }
-
-        totalFilesAnalyzed++
-
-        // Test 1: Does the name match the pattern?
-        if (!isFormatValid(dirent.name)) {
-          console.log(`❌ Migration ${dirent.name} is invalid format`)
-          failedFiles.push({ name: dirent.name, reason: 'format' })
-          continue
-        }
-
-        // Test 2: Is the date in the folder name in the past?
-        if (!isDateValid(dirent.name)) {
-          console.log(`❌ Migration ${dirent.name} is invalid date`)
-          failedFiles.push({ name: dirent.name, reason: 'date' })
-          continue
-        }
-
-        console.log(`✅ Migration "${dirent.name}" is valid`)
+      // Do not check file names
+      if (!dirent.isDirectory()) {
         continue
       }
+
+      // Check if migration is in ignore folder
+      if (ignore.includes(dirent.name)) {
+        console.log(`🟠 Migration ${dirent.name} is ignored`)
+        continue
+      }
+
+      totalFilesAnalyzed++
+
+      // Test 1: Does the name match the pattern?
+      if (!isFormatValid(dirent.name)) {
+        console.log(`❌ Migration ${dirent.name} is invalid format`)
+        failedFiles.push({ name: dirent.name, reason: 'format' })
+        continue
+      }
+
+      // Test 2: Is the date in the folder name in the past?
+      if (!isDateValid(dirent.name)) {
+        console.log(`❌ Migration ${dirent.name} is invalid date`)
+        failedFiles.push({ name: dirent.name, reason: 'date' })
+        continue
+      }
+
+      // Test 3: Does the migration folder contain a migration.sql file?
+      if (!existsSync(joinURL(dirent.parentPath, dirent.name, 'migration.sql'))) {
+        console.log(`❌ Migration ${dirent.name} does not contain a migration.sql file`)
+        failedFiles.push({ name: dirent.name, reason: 'missing' })
+        continue
+      }
+
+      console.log(`✅ Migration "${dirent.name}" is valid`)
 
       // File checks
       if (dirent.isFile()) {
