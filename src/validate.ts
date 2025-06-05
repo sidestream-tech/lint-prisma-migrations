@@ -9,6 +9,7 @@ export async function validate(path: string, ignore: string[]) {
 
   const opendir = fs.promises.opendir
   const existsSync = fs.existsSync
+  const readFile = fs.promises.readFile
 
   const failedFiles: {
     name: string
@@ -48,11 +49,15 @@ export async function validate(path: string, ignore: string[]) {
       }
 
       // Test 3: Does the migration folder contain a migration.sql file?
-      if (!existsSync(joinURL(dirent.parentPath, dirent.name, 'migration.sql'))) {
+      const filePath = joinURL(dirent.parentPath, dirent.name, 'migration.sql')
+      if (!existsSync(filePath)) {
         console.log(`❌ Migration ${dirent.name} does not contain a migration.sql file`)
         failedFiles.push({ name: dirent.name, reason: 'missing' })
         continue
       }
+
+      const migrationFile = await readFile(filePath)
+      console.log(migrationFile)
 
       console.log(`✅ Migration "${dirent.name}" is valid`)
 

@@ -142,6 +142,7 @@ function validate(path, ignore) {
         console.log('---------------------------------------------------------');
         const opendir = node_fs_1.default.promises.opendir;
         const existsSync = node_fs_1.default.existsSync;
+        const readFile = node_fs_1.default.promises.readFile;
         const failedFiles = [];
         let totalFilesAnalyzed = 0;
         try {
@@ -175,11 +176,14 @@ function validate(path, ignore) {
                             continue;
                         }
                         // Test 3: Does the migration folder contain a migration.sql file?
-                        if (!existsSync((0, ufo_1.joinURL)(dirent.parentPath, dirent.name, 'migration.sql'))) {
+                        const filePath = (0, ufo_1.joinURL)(dirent.parentPath, dirent.name, 'migration.sql');
+                        if (!existsSync(filePath)) {
                             console.log(`❌ Migration ${dirent.name} does not contain a migration.sql file`);
                             failedFiles.push({ name: dirent.name, reason: 'missing' });
                             continue;
                         }
+                        const migrationFile = yield readFile(filePath);
+                        console.log(migrationFile);
                         console.log(`✅ Migration "${dirent.name}" is valid`);
                         // File checks
                         if (dirent.isFile()) {
