@@ -2,6 +2,8 @@ import fs from 'node:fs'
 import { joinURL } from 'ufo'
 import { isDateValid } from './rules/date'
 import { isFormatValid } from './rules/format'
+import { hasPRLink } from './rules/link'
+import { hasTransactionWrapper } from './rules/transaction'
 
 export async function validate(path: string, ignore: string[]) {
   console.log(`Validating migrations at ${path}`)
@@ -13,7 +15,7 @@ export async function validate(path: string, ignore: string[]) {
 
   const failedFiles: {
     name: string
-    reason: 'format' | 'date' | 'missing'
+    reason: 'format' | 'date' | 'missing' | 'link' | 'transaction'
   }[] = []
   let totalFilesAnalyzed = 0
 
@@ -56,15 +58,23 @@ export async function validate(path: string, ignore: string[]) {
         continue
       }
 
-      const migrationFile = await readFile(filePath, 'utf8')
-      console.log(migrationFile)
+      const migration = await readFile(filePath, 'utf8')
+
+      // Test 4: Does the migration file have a PR linked at the top?
+      if (!hasPRLink(migration)) {
+        console.log(`❌ Migration ${dirent.name} does not have a PR linked at the top of the migration`)
+        failedFiles.push({ name: dirent.name, reason: 'link' })
+        continue
+      }
+
+      // Test 5: Is the migration wrapped in a transaction block?
+      if (!hasTransactionWrapper(migration)) {
+        console.log(`❌ Migration ${dirent.name} is not wrapped in a transaction block`)
+        failedFiles.push({ name: dirent.name, reason: 'transaction' })
+        continue
+      }
 
       console.log(`✅ Migration "${dirent.name}" is valid`)
-
-      // File checks
-      if (dirent.isFile()) {
-        console.log(dirent)
-      }
     }
 
     console.log('---------------------------------------------------------')
