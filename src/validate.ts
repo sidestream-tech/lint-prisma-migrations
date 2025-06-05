@@ -56,7 +56,7 @@ export async function validate(path: string, ignore: string[]) {
         continue
       }
 
-      const migrationFile = await readFile(filePath)
+      const migrationFile = await readFile(filePath, 'utf8')
       console.log(migrationFile)
 
       console.log(`✅ Migration "${dirent.name}" is valid`)

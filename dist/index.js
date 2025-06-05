@@ -182,7 +182,7 @@ function validate(path, ignore) {
                             failedFiles.push({ name: dirent.name, reason: 'missing' });
                             continue;
                         }
-                        const migrationFile = yield readFile(filePath);
+                        const migrationFile = yield readFile(filePath, 'utf8');
                         console.log(migrationFile);
                         console.log(`✅ Migration "${dirent.name}" is valid`);
                         // File checks
