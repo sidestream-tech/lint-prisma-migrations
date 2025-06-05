@@ -8,9 +8,10 @@ const DEFAULT_PATH = './prisma/migrations/'
 async function run(): Promise<void> {
   try {
     const path = core.getInput('path', { required: false }) || DEFAULT_PATH
-    const ignore = core.getMultilineInput('ignore', { required: false }) || []
+    const ignore = core.getMultilineInput('ignore', { required: false })
+    const rules = core.getMultilineInput('rules', { required: false })
 
-    const output = await validate(path, ignore)
+    const output = await validate(path, { ignore, rules })
 
     core.setOutput('total-files-analyzed', output.totalFilesAnalyzed)
 

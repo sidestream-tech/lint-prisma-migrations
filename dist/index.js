@@ -57,8 +57,9 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const path = core.getInput('path', { required: false }) || DEFAULT_PATH;
-            const ignore = core.getMultilineInput('ignore', { required: false }) || [];
-            const output = yield (0, validate_1.validate)(path, ignore);
+            const ignore = core.getMultilineInput('ignore', { required: false });
+            const rules = core.getMultilineInput('rules', { required: false });
+            const output = yield (0, validate_1.validate)(path, { ignore, rules });
             core.setOutput('total-files-analyzed', output.totalFilesAnalyzed);
             // Get the JSON webhook payload for the event that triggered the workflow
             const payload = JSON.stringify(github.context.payload, undefined, 2);
@@ -176,10 +177,12 @@ const date_1 = __nccwpck_require__(8752);
 const format_1 = __nccwpck_require__(4719);
 const link_1 = __nccwpck_require__(4656);
 const transaction_1 = __nccwpck_require__(4354);
-function validate(path, ignore) {
+const DEFAULT_RULES = ['date', 'format', 'missing', 'link', 'transaction'];
+function validate(path, options) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, e_1, _b, _c;
-        console.log(`Validating migrations at ${path}`);
+        const rules = options.rules.length > 0 ? options.rules : DEFAULT_RULES;
+        console.log(`Validating migrations at ${path} with rules: ${rules.join(', ')}`);
         console.log('---------------------------------------------------------');
         const opendir = node_fs_1.default.promises.opendir;
         const existsSync = node_fs_1.default.existsSync;
@@ -198,39 +201,39 @@ function validate(path, ignore) {
                         continue;
                     }
                     // Check if migration is in ignore folder
-                    if (ignore.includes(dirent.name)) {
+                    if (options.ignore.includes(dirent.name)) {
                         console.log(`🟠 Migration ${dirent.name} is ignored`);
                         continue;
                     }
                     totalFilesAnalyzed++;
                     // Test 1: Does the name match the pattern?
-                    if (!(0, format_1.isFormatValid)(dirent.name)) {
+                    if (!(0, format_1.isFormatValid)(dirent.name) && rules.includes('format')) {
                         console.log(`❌ Migration ${dirent.name} is invalid format`);
                         failedFiles.push({ name: dirent.name, reason: 'format' });
                         continue;
                     }
                     // Test 2: Is the date in the folder name in the past?
-                    if (!(0, date_1.isDateValid)(dirent.name)) {
+                    if (!(0, date_1.isDateValid)(dirent.name) && rules.includes('date')) {
                         console.log(`❌ Migration ${dirent.name} is invalid date`);
                         failedFiles.push({ name: dirent.name, reason: 'date' });
                         continue;
                     }
                     // Test 3: Does the migration folder contain a migration.sql file?
                     const filePath = (0, ufo_1.joinURL)(dirent.parentPath, dirent.name, 'migration.sql');
-                    if (!existsSync(filePath)) {
+                    if (!existsSync(filePath) && rules.includes('missing')) {
                         console.log(`❌ Migration ${dirent.name} does not contain a migration.sql file`);
                         failedFiles.push({ name: dirent.name, reason: 'missing' });
                         continue;
                     }
                     const migration = yield readFile(filePath, 'utf8');
                     // Test 4: Does the migration file have a PR linked at the top?
-                    if (!(0, link_1.hasPRLink)(migration)) {
+                    if (!(0, link_1.hasPRLink)(migration) && rules.includes('link')) {
                         console.log(`❌ Migration ${dirent.name} does not have a PR linked at the top of the migration`);
                         failedFiles.push({ name: dirent.name, reason: 'link' });
                         continue;
                     }
                     // Test 5: Is the migration wrapped in a transaction block?
-                    if (!(0, transaction_1.hasTransactionWrapper)(migration)) {
+                    if (!(0, transaction_1.hasTransactionWrapper)(migration) && rules.includes('transaction')) {
                         console.log(`❌ Migration ${dirent.name} is not wrapped in a transaction block`);
                         failedFiles.push({ name: dirent.name, reason: 'transaction' });
                         continue;

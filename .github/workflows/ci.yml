@@ -38,15 +38,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Tests folders that should work
+      - name: Test all rules
         uses: ./
         with:
-          path: './stubs'
+          path: './stubs/all_rules'
 
-      - name: Tests folders are ignored
+      - name: Test ignore option
         uses: ./
         with:
-          path: './stubs'
+          path: './stubs/all_rules'
           ignore: |
             20250101000000_should_work
             20240101000000_should_also_work
+
+      - name: Test only name rules
+        uses: ./
+        with:
+          path: './stubs/name_rules'
+          rules: |
+            date
+            format
+
+      - name: Test only file rules
+        uses: ./
+        with:
+          path: './stubs/files_rules'
+          rules: |
+            missing
+            link
+            transaction

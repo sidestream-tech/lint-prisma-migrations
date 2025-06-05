@@ -11,6 +11,9 @@ inputs:
   ignore:
     description: 'A list of migration names to ignore'
     required: false
+  rules:
+    description: 'The list of rules you would like to run'
+    required: false
 outputs:
   total-files-analyzed:
     description: 'The number of files analyzed.'
