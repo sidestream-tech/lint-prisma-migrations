@@ -10,3 +10,5 @@ CREATE TABLE "MyTable" (
 
     CONSTRAINT "TaskError_pkey" PRIMARY KEY ("id")
 );
+
+COMMIT;
