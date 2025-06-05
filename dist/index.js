@@ -122,7 +122,8 @@ function isFormatValid(name) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.hasPRLink = hasPRLink;
 function hasPRLink(migration) {
-    return migration.trim().startsWith('-- https://github.com/');
+    const trimmedContent = migration.trim();
+    return trimmedContent.startsWith('-- https://github.com/') || trimmedContent.startsWith('-- PR: https://github.com/');
 }
 
 

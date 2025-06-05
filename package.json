@@ -1,6 +1,6 @@
 {
   "name": "@sidestream-tech/lint-prisma-migrations",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "main": "lib/main.js",
   "engines": {
