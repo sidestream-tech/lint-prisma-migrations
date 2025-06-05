@@ -55,8 +55,15 @@ jobs:
         uses: ./
         with:
           path: './stubs/name_rules'
+          rules: |
+            date
+            format
 
       - name: Test only file rules
         uses: ./
         with:
           path: './stubs/files_rules'
+          rules: |
+            missing
+            link
+            transaction
