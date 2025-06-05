@@ -140,7 +140,6 @@ function validate(path, ignore) {
         console.log(`Validating migrations at ${path}`);
         console.log('---------------------------------------------------------');
         const opendir = node_fs_1.default.promises.opendir;
-        const readFile = node_fs_1.default.promises.readFile;
         const failedFiles = [];
         let totalFilesAnalyzed = 0;
         try {
@@ -174,7 +173,6 @@ function validate(path, ignore) {
                             continue;
                         }
                         console.log(dirent.parentPath);
-                        const fileContents = yield readFile(dirent.parentPath);
                         console.log(`✅ Migration "${dirent.name}" is valid`);
                     }
                     finally {
