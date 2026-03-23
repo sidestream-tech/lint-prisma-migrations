@@ -36,8 +36,11 @@ describe('validateLocaleValues', () => {
     expect(types).toContainEqual(['meta', 'object'])
   })
 
-  it('throws on empty input', () => {
-    expect(() => validateLocaleValues({})).toThrow('Cannot validate an empty locale object')
+  it('returns empty results for empty input', () => {
+    const { validData, invalidValues } = validateLocaleValues({})
+
+    expect(validData).toEqual({})
+    expect(invalidValues).toEqual([])
   })
 })
 
@@ -80,8 +83,10 @@ describe('detectFlatKeyNamespaceConflicts', () => {
     expect(pairs).toContainEqual(['a.b', 'a.b.c'])
   })
 
-  it('throws on empty input', () => {
-    expect(() => detectFlatKeyNamespaceConflicts({})).toThrow('Cannot detect conflicts in an empty locale object')
+  it('returns empty results for empty input', () => {
+    const result = detectFlatKeyNamespaceConflicts({})
+
+    expect(result).toEqual([])
   })
 
   it('returns no conflicts for keys without dots', () => {

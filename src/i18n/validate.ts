@@ -6,10 +6,10 @@ import { findJsonFilesRecursively } from './file-discovery.js'
 interface I18nValidationResult {
   totalFilesAnalyzed: number
   lintedResults: LocaleFileAnalysisResult[]
+  filesWithErrors: LocaleFileAnalysisResult[]
   skippedResults: LocaleFileAnalysisResult[]
   totalConflictCount: number
   totalInvalidValueCount: number
-  totalFilesWithErrors: number
 }
 
 export async function validate(path: string): Promise<I18nValidationResult> {
@@ -27,27 +27,25 @@ export async function validate(path: string): Promise<I18nValidationResult> {
   const skippedResults = analysisResults.filter(result => result.error)
   const lintedResults = analysisResults.filter(result => !result.error)
 
+  const filesWithErrors: LocaleFileAnalysisResult[] = []
   let totalConflictCount = 0
   let totalInvalidValueCount = 0
-  let totalFilesWithErrors = 0
 
   for (const result of lintedResults) {
-    const errorCount = result.invalidValues.length + result.conflicts.length
-
-    if (errorCount > 0) {
-      totalFilesWithErrors++
-    }
-
     totalConflictCount += result.conflicts.length
     totalInvalidValueCount += result.invalidValues.length
+
+    if (result.invalidValues.length > 0 || result.conflicts.length > 0) {
+      filesWithErrors.push(result)
+    }
   }
 
   return {
     totalFilesAnalyzed: jsonFiles.length,
     lintedResults,
+    filesWithErrors,
     skippedResults,
     totalConflictCount,
     totalInvalidValueCount,
-    totalFilesWithErrors,
   }
 }

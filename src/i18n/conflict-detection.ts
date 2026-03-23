@@ -6,6 +6,12 @@ function isPlainJsonObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+/**
+ * Matches a JSON key declaration: optional whitespace, `"key":` (e.g. `  "expand.all": "value"`).
+ * Note: does not handle escaped quotes within JSON keys (e.g. `"key\"name"`).
+ */
+const JSON_KEY_PATTERN = /^\s*"([^"]+)"\s*:/
+
 /** Maps each JSON key to its 1-based line number by scanning the raw file content. */
 function buildKeyLineMap(rawContent: string) {
   const lineMap = new Map<string, number>()
@@ -18,11 +24,7 @@ function buildKeyLineMap(rawContent: string) {
       continue
     }
 
-    /**
-     * Matches a JSON key declaration: optional whitespace, `"key":` (e.g. `  "expand.all": "value"`).
-     * Note: does not handle escaped quotes within JSON keys (e.g. `"key\"name"`).
-     */
-    const match = line.match(/^\s*"([^"]+)"\s*:/)
+    const match = line.match(JSON_KEY_PATTERN)
 
     if (match?.[1] !== undefined) {
       lineMap.set(match[1], lineIndex + 1)
@@ -34,10 +36,6 @@ function buildKeyLineMap(rawContent: string) {
 
 /** Validates that all values in a parsed locale object are strings. */
 export function validateLocaleValues(data: Record<string, unknown>) {
-  if (Object.keys(data).length === 0) {
-    throw new Error('Cannot validate an empty locale object')
-  }
-
   const validData: FlatKeyLocaleData = {}
   const invalidValues: InvalidValueError[] = []
 
@@ -58,11 +56,6 @@ export function validateLocaleValues(data: Record<string, unknown>) {
 /** Detects flat-key namespace conflicts where a key is both a leaf value and a prefix of another key. */
 export function detectFlatKeyNamespaceConflicts(localeData: FlatKeyLocaleData) {
   const localeKeys = new Set(Object.keys(localeData))
-
-  if (localeKeys.size === 0) {
-    throw new Error('Cannot detect conflicts in an empty locale object')
-  }
-
   const conflicts: NamespaceConflict[] = []
 
   for (const key of localeKeys) {
@@ -82,7 +75,13 @@ export function detectFlatKeyNamespaceConflicts(localeData: FlatKeyLocaleData) {
         })
       }
 
-      prefix += `.${segments[segmentIndex]}`
+      const segment = segments[segmentIndex]
+
+      if (segment === undefined) {
+        continue
+      }
+
+      prefix += `.${segment}`
     }
   }
 

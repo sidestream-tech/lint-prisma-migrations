@@ -12,21 +12,21 @@ describe('i18n validate', () => {
     expect(result.totalFilesAnalyzed).toBe(2)
     expect(result.totalConflictCount).toBe(0)
     expect(result.totalInvalidValueCount).toBe(0)
-    expect(result.totalFilesWithErrors).toBe(0)
+    expect(result.filesWithErrors.length).toBe(0)
   })
 
   it('detects conflicts', async () => {
     const result = await validate(resolve(fixturesPath, 'conflicting'))
 
     expect(result.totalConflictCount).toBeGreaterThan(0)
-    expect(result.totalFilesWithErrors).toBeGreaterThan(0)
+    expect(result.filesWithErrors.length).toBeGreaterThan(0)
   })
 
   it('detects invalid values', async () => {
     const result = await validate(resolve(fixturesPath, 'invalid-values'))
 
     expect(result.totalInvalidValueCount).toBeGreaterThan(0)
-    expect(result.totalFilesWithErrors).toBeGreaterThan(0)
+    expect(result.filesWithErrors.length).toBeGreaterThan(0)
   })
 
   it('reports skipped files for invalid JSON', async () => {

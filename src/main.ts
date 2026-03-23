@@ -34,23 +34,19 @@ async function run(): Promise<void> {
         const output = await validateI18n(i18nPath)
         core.setOutput('i18n-files-analyzed', output.totalFilesAnalyzed)
 
-        for (const result of output.lintedResults) {
-          const errorCount = result.invalidValues.length + result.conflicts.length
+        for (const result of output.filesWithErrors) {
+          core.info(result.filePath)
 
-          if (errorCount > 0) {
-            core.info(result.filePath)
+          for (const invalidValue of result.invalidValues) {
+            const linePrefix = invalidValue.line !== undefined ? `Line ${invalidValue.line}: ` : ''
+            const message = `${linePrefix}Key "${invalidValue.key}" has invalid value type "${invalidValue.actualType}" (expected "string")`
+            core.error(message, { file: result.filePath, startLine: invalidValue.line })
+          }
 
-            for (const invalidValue of result.invalidValues) {
-              const linePrefix = invalidValue.line !== undefined ? `Line ${invalidValue.line}: ` : ''
-              const message = `${linePrefix}Key "${invalidValue.key}" has invalid value type "${invalidValue.actualType}" (expected "string")`
-              core.error(message, { file: result.filePath, startLine: invalidValue.line })
-            }
-
-            for (const conflict of result.conflicts) {
-              const linePrefix = conflict.leafKeyLine !== undefined ? `Line ${conflict.leafKeyLine}: ` : ''
-              const message = `${linePrefix}Key "${conflict.leafKey}" conflicts with "${conflict.conflictingDescendantKey}" — a key cannot be both a value and a namespace prefix`
-              core.error(message, { file: result.filePath, startLine: conflict.leafKeyLine })
-            }
+          for (const conflict of result.conflicts) {
+            const linePrefix = conflict.leafKeyLine !== undefined ? `Line ${conflict.leafKeyLine}: ` : ''
+            const message = `${linePrefix}Key "${conflict.leafKey}" conflicts with "${conflict.conflictingDescendantKey}" - a key cannot be both a value and a namespace prefix`
+            core.error(message, { file: result.filePath, startLine: conflict.leafKeyLine })
           }
         }
 
@@ -62,7 +58,9 @@ async function run(): Promise<void> {
           core.endGroup()
         }
 
+        const skippedSuffix = output.skippedResults.length > 0 ? ` (${output.skippedResults.length} skipped)` : ''
         const totalErrorCount = output.totalConflictCount + output.totalInvalidValueCount
+
         if (totalErrorCount > 0) {
           const parts: string[] = []
 
@@ -74,10 +72,8 @@ async function run(): Promise<void> {
             parts.push(`${output.totalInvalidValueCount} invalid value(s)`)
           }
 
-          const skippedSuffix = output.skippedResults.length > 0 ? ` (${output.skippedResults.length} skipped)` : ''
-          errors.push(`i18n: Found ${parts.join(' and ')} across ${output.totalFilesWithErrors} file(s)${skippedSuffix}`)
+          errors.push(`i18n: Found ${parts.join(' and ')} across ${output.filesWithErrors.length} file(s)${skippedSuffix}`)
         } else {
-          const skippedSuffix = output.skippedResults.length > 0 ? ` (${output.skippedResults.length} skipped)` : ''
           core.info(`i18n: All ${output.lintedResults.length} file(s) linted successfully${skippedSuffix}`)
         }
       } catch (error) {
