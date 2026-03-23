@@ -30,10 +30,12 @@ export async function validate(path: string, options: ValidateOptions) {
     const dir = await opendir(path)
 
     for await (const dirent of dir) {
+      // Do not check file names
       if (!dirent.isDirectory()) {
         continue
       }
 
+      // Check if migration is in ignore folder
       if (options.ignore.includes(dirent.name)) {
         console.info(`🟠 Migration ${dirent.name} is ignored`)
         continue
@@ -41,18 +43,21 @@ export async function validate(path: string, options: ValidateOptions) {
 
       totalFilesAnalyzed++
 
+      // Test 1: Does the name match the pattern?
       if (!isFormatValid(dirent.name) && rules.includes('format')) {
         console.info(`❌ Migration ${dirent.name} is invalid format`)
         failedFiles.push({ name: dirent.name, reason: 'format' })
         continue
       }
 
+      // Test 2: Is the date in the folder name in the past?
       if (!isDateValid(dirent.name) && rules.includes('date')) {
         console.info(`❌ Migration ${dirent.name} is invalid date`)
         failedFiles.push({ name: dirent.name, reason: 'date' })
         continue
       }
 
+      // Test 3: Does the migration folder contain a migration.sql file?
       const filePath = join(dirent.parentPath, dirent.name, 'migration.sql')
       if (!existsSync(filePath) && rules.includes('missing')) {
         console.info(`❌ Migration ${dirent.name} does not contain a migration.sql file`)
@@ -62,12 +67,14 @@ export async function validate(path: string, options: ValidateOptions) {
 
       const migration = await readFile(filePath, 'utf8')
 
+      // Test 4: Does the migration file have a PR linked at the top?
       if (!hasPRLink(migration) && rules.includes('link')) {
         console.info(`❌ Migration ${dirent.name} does not have a PR linked at the top of the migration`)
         failedFiles.push({ name: dirent.name, reason: 'link' })
         continue
       }
 
+      // Test 5: Is the migration wrapped in a transaction block?
       if (!hasTransactionWrapper(migration) && rules.includes('transaction')) {
         console.info(`❌ Migration ${dirent.name} is not wrapped in a transaction block`)
         failedFiles.push({ name: dirent.name, reason: 'transaction' })
