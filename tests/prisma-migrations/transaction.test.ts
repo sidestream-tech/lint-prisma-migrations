@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { hasTransactionWrapper } from '../../src/rules/transaction'
+import { hasTransactionWrapper } from '../../src/prisma-migrations/rules/transaction.js'
 
-import { CORRECT_MIGRATION, INCORRECT_MIGRATION_TRANSACTION_BLOCK } from '../stubs'
+import { CORRECT_MIGRATION, INCORRECT_MIGRATION_TRANSACTION_BLOCK } from './stubs.js'
 
 describe('test transaction rule', () => {
   it('migration is wrapped in a transaction block', () => {

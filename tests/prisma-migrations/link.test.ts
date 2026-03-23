@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { hasPRLink } from '../../src/rules/link'
+import { hasPRLink } from '../../src/prisma-migrations/rules/link.js'
 
-import { CORRECT_MIGRATION, INCORRECT_MIGRATION_PR_LINK } from '../stubs'
+import { CORRECT_MIGRATION, INCORRECT_MIGRATION_PR_LINK } from './stubs.js'
 
 describe('test pr-link rule', () => {
   it('migration has a pr link', () => {
