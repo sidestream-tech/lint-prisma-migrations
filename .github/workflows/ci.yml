@@ -6,8 +6,8 @@ on:
     branches: [main]
 
 env:
-  NODE_VERSION: '22.16.0'
-  PNPM_VERSION: '10.7.0'
+  NODE_VERSION: '24.14.0'
+  PNPM_VERSION: '10.32.1'
 
 jobs:
   lint:
