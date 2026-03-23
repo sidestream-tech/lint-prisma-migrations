@@ -22,5 +22,5 @@ outputs:
   i18n-files-analyzed:
     description: 'The number of i18n JSON files analyzed'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
