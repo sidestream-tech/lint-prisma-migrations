@@ -1,4 +1,4 @@
-name: 'test'
+name: CI
 on:
   pull_request:
     branches: [main]
@@ -10,7 +10,7 @@ env:
   PNPM_VERSION: '10.20.0'
 
 jobs:
-  lint:
+  lint-test-build-code:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -79,7 +79,7 @@ jobs:
         with:
           i18n-path: './stubs/i18n/valid'
 
-  integration-combined:
+  integration:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
