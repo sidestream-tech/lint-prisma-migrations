@@ -1,4 +1,4 @@
-import type { FlatKeyLocaleData, InvalidValueError, LocaleFileAnalysisResult, NamespaceConflict } from './types.js'
+import type { FlatKeyLocaleData, InvalidValueError, LocaleFileAnalysisResult, NamespaceConflict } from '../types.js'
 
 import { readFile } from 'node:fs/promises'
 

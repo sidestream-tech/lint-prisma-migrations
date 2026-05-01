@@ -1,7 +1,7 @@
 import type { LocaleFileAnalysisResult } from './types.js'
 
-import { analyzeLocaleFile } from './conflict-detection.js'
-import { findJsonFilesRecursively } from './file-discovery.js'
+import { analyzeLocaleFile } from './rules/conflict-detection.js'
+import { findJsonFilesRecursively } from './rules/file-discovery.js'
 
 interface I18nValidationResult {
   totalFilesAnalyzed: number
