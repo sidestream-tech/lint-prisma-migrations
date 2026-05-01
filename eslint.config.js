@@ -5,6 +5,8 @@ const ignores = [
   'dist',
   'lib',
   'demo',
+  // Intentionally invalid JSON used as test fixture for the i18n linter
+  'tests/i18n/fixtures/invalid',
 ]
 
 export default antfu({

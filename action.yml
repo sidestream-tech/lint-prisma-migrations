@@ -1,22 +1,26 @@
 name: 'Lint Prisma migrations action'
-description: 'Goes through all Prisma migrations and ensures that the migration names match a standard format and have a valid date prefix'
+description: 'Lints Prisma migrations and/or flat-key i18n JSON files'
 branding:
-  icon: 'database'
+  icon: 'check-circle'
   color: 'green'
 inputs:
-  path:
-    description: 'The path to the prisma migrations directory'
+  prisma-migrations-path:
+    description: 'Path to the Prisma migrations directory'
     required: false
-    default: './prisma/migrations/'
-  ignore:
+  prisma-migrations-ignore:
     description: 'A list of migration names to ignore'
     required: false
-  rules:
+  prisma-migrations-rules:
     description: 'The list of rules you would like to run'
     required: false
+  i18n-path:
+    description: 'Path to the i18n directory containing locale JSON files'
+    required: false
 outputs:
-  total-files-analyzed:
-    description: 'The number of files analyzed.'
+  prisma-migrations-files-analyzed:
+    description: 'The number of Prisma migration files analyzed'
+  i18n-files-analyzed:
+    description: 'The number of i18n JSON files analyzed'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'

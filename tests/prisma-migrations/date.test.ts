@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { isDateValid } from '../../src/rules/date'
+import { isDateValid } from '../../src/prisma-migrations/rules/date.js'
 
-import { VALID_NAMES } from '../stubs'
+import { VALID_NAMES } from './stubs.js'
 
 const FUTURE_NAME_DATE = `${new Date().getFullYear() + 1}0101000000_future_date`
 

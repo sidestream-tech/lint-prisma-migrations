@@ -1,29 +1,30 @@
 {
   "name": "@sidestream-tech/lint-prisma-migrations",
+  "type": "module",
   "version": "2.0.2",
   "private": true,
+  "packageManager": "pnpm@10.20.0",
   "main": "lib/main.js",
   "engines": {
-    "pnpm": ">=10.7.0",
-    "node": ">=22.16.0"
+    "pnpm": ">=10.20.0",
+    "node": ">=24.11.0"
   },
   "scripts": {
     "build": "tsc",
     "lint": "eslint --max-warnings 0 .",
     "test": "vitest run",
-    "package": "ncc build --source-map"
+    "package": "ncc build src/main.ts --source-map"
   },
   "dependencies": {
-    "@actions/core": "^1.8.2",
-    "@actions/github": "^6.0.1",
-    "ufo": "^1.6.1"
+    "@actions/core": "^3.0.0",
+    "@actions/github": "^9.0.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.13.3",
-    "@types/node": "22.15.29",
-    "@vercel/ncc": "^0.38.3",
-    "eslint": "^9.28.0",
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.2"
+    "@antfu/eslint-config": "^7.7.3",
+    "@types/node": "^25.5.0",
+    "@vercel/ncc": "^0.38.4",
+    "eslint": "^10.1.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   }
 }

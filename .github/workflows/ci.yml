@@ -1,4 +1,4 @@
-name: 'test'
+name: CI
 on:
   pull_request:
     branches: [main]
@@ -6,11 +6,11 @@ on:
     branches: [main]
 
 env:
-  NODE_VERSION: '22.16.0'
-  PNPM_VERSION: '10.7.0'
+  NODE_VERSION: '24.11.0'
+  PNPM_VERSION: '10.20.0'
 
 jobs:
-  lint:
+  lint-test-build-code:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,38 +32,61 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
-  tests:
+  integration-prisma-migrations:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Test all rules
         uses: ./
         with:
-          path: './stubs/all_rules'
+          prisma-migrations-path: './stubs/prisma-migrations/all_rules'
 
       - name: Test ignore option
         uses: ./
         with:
-          path: './stubs/all_rules'
-          ignore: |
+          prisma-migrations-path: './stubs/prisma-migrations/all_rules'
+          prisma-migrations-ignore: |
             20250101000000_should_work
             20240101000000_should_also_work
 
       - name: Test only name rules
         uses: ./
         with:
-          path: './stubs/name_rules'
-          rules: |
+          prisma-migrations-path: './stubs/prisma-migrations/name_rules'
+          prisma-migrations-rules: |
             date
             format
 
       - name: Test only file rules
         uses: ./
         with:
-          path: './stubs/files_rules'
-          rules: |
+          prisma-migrations-path: './stubs/prisma-migrations/files_rules'
+          prisma-migrations-rules: |
             missing
             link
             transaction
+
+  integration-i18n:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test valid i18n files
+        uses: ./
+        with:
+          i18n-path: './stubs/i18n/valid'
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test both linters together
+        uses: ./
+        with:
+          prisma-migrations-path: './stubs/prisma-migrations/all_rules'
+          i18n-path: './stubs/i18n/valid'
