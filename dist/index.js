@@ -36208,7 +36208,7 @@ function getOctokit(token, options, ...additionalPlugins) {
 //# sourceMappingURL=github.js.map
 ;// CONCATENATED MODULE: external "node:fs/promises"
 const promises_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs/promises");
-;// CONCATENATED MODULE: ./src/i18n/conflict-detection.ts
+;// CONCATENATED MODULE: ./src/i18n/rules/conflict-detection.ts
 
 function isPlainJsonObject(value) {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -36312,7 +36312,7 @@ async function analyzeLocaleFile(filePath) {
 
 ;// CONCATENATED MODULE: external "node:path"
 const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
-;// CONCATENATED MODULE: ./src/i18n/file-discovery.ts
+;// CONCATENATED MODULE: ./src/i18n/rules/file-discovery.ts
 
 
 /** Recursively finds all `.json` files under a directory. */
