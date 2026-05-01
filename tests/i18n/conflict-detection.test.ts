@@ -1,7 +1,7 @@
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { analyzeLocaleFile, detectFlatKeyNamespaceConflicts, validateLocaleValues } from '../../src/i18n/conflict-detection.js'
+import { analyzeLocaleFile, detectFlatKeyNamespaceConflicts, validateLocaleValues } from '../../src/i18n/rules/conflict-detection.js'
 
 const fixturesPath = resolve(import.meta.dirname, 'fixtures')
 

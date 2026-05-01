@@ -1,7 +1,7 @@
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { findJsonFilesRecursively } from '../../src/i18n/file-discovery.js'
+import { findJsonFilesRecursively } from '../../src/i18n/rules/file-discovery.js'
 
 const fixturesPath = resolve(import.meta.dirname, 'fixtures')
 
